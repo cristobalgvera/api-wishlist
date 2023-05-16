@@ -1,5 +1,4 @@
 import { EnvironmentService } from '@core/environment';
-import { createCustomLogger } from '@core/logger';
 import { INestApplication, Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -20,12 +19,6 @@ async function bootstrap() {
       transformOptions: {
         enableImplicitConversion: true,
       },
-    }),
-  );
-
-  app.useLogger(
-    createCustomLogger(environmentService.isProd(), {
-      service: 'server-wishlist',
     }),
   );
 
