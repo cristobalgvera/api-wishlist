@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { Product } from './product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { ProductDto, ToggleCheckedDto } from './dtos';
+import { GroupedProductsDto, ToggleCheckedDto } from './dtos';
 import { ProductMapperService } from './product-mapper.service';
 
 @Injectable()
@@ -13,10 +13,30 @@ export class WishListService {
     private readonly productMapperService: ProductMapperService,
   ) {}
 
-  async findAll(): Promise<ProductDto[]> {
+  async findAll(): Promise<GroupedProductsDto> {
     const products = await this.productRepository.find();
 
-    return products.map((product) => this.productMapperService.map(product));
+    const { checked, unchecked } = this.groupProducts(products);
+
+    return {
+      checkedProducts: checked.map(this.productMapperService.map),
+      uncheckedProducts: unchecked.map(this.productMapperService.map),
+    };
+  }
+
+  groupProducts(products: Product[]) {
+    return products.reduce(
+      (groupedProducts, product) => {
+        if (product.checked) groupedProducts.checked.push(product);
+        else groupedProducts.unchecked.push(product);
+
+        return groupedProducts;
+      },
+      { checked: [], unchecked: [] } as {
+        checked: Product[];
+        unchecked: Product[];
+      },
+    );
   }
 
   async toggleChecked(
