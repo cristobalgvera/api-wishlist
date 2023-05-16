@@ -8,8 +8,7 @@ import { AppModule } from './app.module';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // TODO: Add proper global prefix
-  app.setGlobalPrefix('SERVICE_PREFIX');
+  app.setGlobalPrefix('api');
   app.enableVersioning();
 
   const environmentService = app.get(EnvironmentService);
@@ -25,8 +24,7 @@ async function bootstrap() {
 
   app.useLogger(
     createCustomLogger(environmentService.isProd(), {
-      // TODO: Add proper service name
-      service: 'SERVICE_NAME',
+      service: 'server-wishlist',
     }),
   );
 
@@ -44,8 +42,7 @@ function enableSwagger(app: INestApplication) {
   const SWAGGER_PATH = 'api-doc';
 
   const config = new DocumentBuilder()
-    // TODO: Add proper service name
-    .setTitle('SERVICE_NAME')
+    .setTitle('Server Wishlist')
     .setExternalDoc('Postman collection', `${SWAGGER_PATH}-json`)
     .build();
 
