@@ -8,7 +8,8 @@ export class DatabaseService implements TypeOrmOptionsFactory {
 
   createTypeOrmOptions(): TypeOrmModuleOptions {
     const sharedTypeOrmModuleOptions: TypeOrmModuleOptions = {
-      type: 'mysql',
+      type: 'postgres',
+      host: this.environmentService.get('DB_HOST'),
       port: this.environmentService.get('DB_PORT'),
       username: this.environmentService.get('DB_USERNAME'),
       password: this.environmentService.get('DB_PASSWORD'),
@@ -22,12 +23,11 @@ export class DatabaseService implements TypeOrmOptionsFactory {
     if (this.environmentService.isProd())
       return {
         ...sharedTypeOrmModuleOptions,
-        socketPath: this.environmentService.get('DB_SOCKET_PATH'),
+        ssl: {
+          ca: this.environmentService.get('DB_SSL_CA'),
+        },
       };
 
-    return {
-      ...sharedTypeOrmModuleOptions,
-      host: this.environmentService.get('DB_HOST'),
-    };
+    return sharedTypeOrmModuleOptions;
   }
 }

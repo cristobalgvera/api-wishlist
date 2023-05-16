@@ -7,12 +7,12 @@ const productionEnvironmentSchema: Joi.StrictSchemaMap<Environment> = {
     .default('development'),
   PORT: Joi.number().default(8080),
   IS_SWAGGER_ENABLED: Joi.boolean().default(true),
-  DB_HOST: Joi.string().forbidden(),
+  DB_HOST: Joi.string().required(),
   DB_PORT: Joi.number().port().required(),
   DB_USERNAME: Joi.string().required(),
   DB_PASSWORD: Joi.string().required(),
   DB_NAME: Joi.string().required(),
-  DB_SOCKET_PATH: Joi.string().required(),
+  DB_SSL_CA: Joi.string().required(),
 };
 
 export const environmentSchema = Joi.object<Environment, true>({
@@ -20,7 +20,6 @@ export const environmentSchema = Joi.object<Environment, true>({
 }).when(Joi.object({ NODE_ENV: Joi.invalid('production') }).unknown(), {
   then: Joi.object<Environment, true>({
     ...productionEnvironmentSchema,
-    DB_SOCKET_PATH: Joi.string().forbidden(),
-    DB_HOST: Joi.string().required(),
+    DB_SSL_CA: Joi.string().forbidden(),
   }),
 });

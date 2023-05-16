@@ -19,11 +19,11 @@ describe('DatabaseService', () => {
     const environment = {
       DB_HOST: 'DB_HOST',
       DB_NAME: 'DB_NAME',
+      DB_SSL_CA: 'DB_SSL_CA',
       DB_PASSWORD: 'DB_PASSWORD',
       DB_PORT: 1234,
       DB_USERNAME: 'DB_USERNAME',
-      DB_SOCKET_PATH: 'DB_SOCKET_PATH',
-    } as Environment;
+    } as Readonly<Environment>;
 
     beforeEach(() => {
       jest
@@ -34,6 +34,7 @@ describe('DatabaseService', () => {
     it('should contain the credential properties', () => {
       const expected: TypeOrmModuleOptions = {
         port: environment.DB_PORT,
+        host: environment.DB_HOST,
         username: environment.DB_USERNAME,
         password: environment.DB_PASSWORD,
         database: environment.DB_NAME,
@@ -79,22 +80,12 @@ describe('DatabaseService', () => {
 
       it('should contain extra connection properties', () => {
         const expected: TypeOrmModuleOptions = {
-          socketPath: environment.DB_SOCKET_PATH,
+          ssl: { ca: environment.DB_SSL_CA },
         };
 
         const actual = underTest.createTypeOrmOptions();
 
         expect(actual).toMatchObject<TypeOrmModuleOptions>(expected);
-      });
-
-      it('should not contain some connection properties', () => {
-        const nonExpectedProperties: Array<keyof MysqlConnectionOptions> = [
-          'host',
-        ];
-
-        const actual = underTest.createTypeOrmOptions();
-
-        nonExpectedProperties.forEach(expect(actual).not.toHaveProperty);
       });
     });
 
@@ -114,9 +105,9 @@ describe('DatabaseService', () => {
       });
 
       it('should not contain some connection properties as undefined', () => {
-        const nonExpectedProperties: Array<keyof MysqlConnectionOptions> = [
-          'socketPath',
-        ];
+        const nonExpectedProperties: ReadonlyArray<
+          keyof MysqlConnectionOptions
+        > = ['ssl'];
 
         const actual = underTest.createTypeOrmOptions();
 
